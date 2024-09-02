@@ -1,0 +1,55 @@
+@host = 127.0.0.1:5000
+
+###
+
+GET http://{{host}}/api
+Content-Type: application/x-www-form-urlencoded
+
+name=askfiy &
+age=27 &
+timestamp={{$timestamp}} &
+uuid={{$uuid}} &
+date={{$date}} &
+rand={{$randomInt}} &
+rand1={{$randomInt 1000 2000}} &
+rand2={{$randomInt 1000 2000}} &
+isoTimestamp={{$isoTimestamp}}
+
+###
+
+POST http://127.0.0.1:5000/api
+Content-Type: application/json
+
+{
+  "name": "askfiy",
+  "age": "27"
+}
+
+###
+
+POST http://127.0.0.1:5000/upload
+Content-Type: multipart/form-data
+
+name=askfiy 
+age=18
+@image=$HOME/Pictures/2024-06-25_11-09.png
+
+
+###
+
+POST http://{{host}}/upload
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<Request>
+  <Login>login</Login>
+  <Password>password</Password>
+</Request>
+
+
+###
+
+POST http://{{host}}/upload
+Content-Type: application/image
+
+< $HOME/Pictures/2024-06-25_11-09.png
