@@ -42,7 +42,6 @@ To install using [lazy.nvim](https://github.com/folke/lazy.nvim):
 ```lua
 {
     "askfiy/http-client.nvim",
-    priority = 100,
     config = function()
         require("http-client").setup()
     end,
