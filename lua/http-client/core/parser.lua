@@ -215,6 +215,7 @@ end
 function M.rest_node_analyse(rest_node)
     local rest_data = {}
 
+    rest_data.method = "GET"
     rest_data.headers = {}
     rest_data.form_data = {}
     rest_data.files = {}
