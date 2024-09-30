@@ -42,7 +42,7 @@ function Response.new(resp_data)
                 self.headers_to_dict[key] = value
 
                 -- Identify and store the content type
-                if key:lower():match("content%-type") then
+                if key:lower():match("^content%-type") then
                     self.content_type = vim.fn.trim(value:lower())
                 end
             end
