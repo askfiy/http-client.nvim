@@ -119,13 +119,24 @@ function Render:open()
         vim.bo[self.bufnr].syntax = "markdown"
         vim.bo[self.bufnr].filetype = "markdown"
 
-        vim.lsp.util.stylize_markdown(
-            self.bufnr,
+        -- vim.lsp.util.stylize_markdown(
+        --     self.bufnr,
+        --     vim.fn.split(self.template, "\n"),
+        --     {
+        --         width = vim.api.nvim_win_get_width(global_window),
+        --     }
+        -- )
+
+        local content = vim.lsp.util._normalize_markdown(
             vim.fn.split(self.template, "\n"),
             {
+
                 width = vim.api.nvim_win_get_width(global_window),
             }
         )
+
+        vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, content)
+        vim.api.nvim_win_set_buf(global_window, self.bufnr)
 
         vim.bo[self.bufnr].modifiable = false
     end
