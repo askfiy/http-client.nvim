@@ -108,6 +108,7 @@ The plugin provides 3 commands:
 - `HttpClient lastRender` - Renders the last request result
 - `HttpClient lastRequest` - Resends the last request
 - `HttpClient sendRequest` - Sends the request under the current cursor
+- `HttpClient stopRequest` - Stop all active request
 
 ## Project Structure
 

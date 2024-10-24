@@ -44,4 +44,11 @@ function Stack:peek()
     return self.container[1] -- Return the top element of the stack without removing it.
 end
 
+---@param func function Every operate client.
+function Stack:every(func)
+    for _, client in ipairs(self.container) do
+        func(client)
+    end
+end
+
 return Stack

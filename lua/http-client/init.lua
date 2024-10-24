@@ -59,6 +59,20 @@ local function last_render()
     end
 end
 
+local function stop_request()
+    if not stack:is_empty() then
+        stack:every(function(client)
+            if not client.stoped then
+                client:stop()
+            end
+        end)
+    else
+        vim.notify("Failed, not found active client", "ERROR", {
+            annote = "[http-client]",
+        })
+    end
+end
+
 ---@param opts table<string, any>
 function M.setup(opts)
     config.update(opts)
@@ -69,6 +83,7 @@ function M.setup(opts)
         sendRequest = send_request,
         lastRequest = last_request,
         lastRender = last_render,
+        stopRequest = stop_request,
     }
 
     vim.api.nvim_create_user_command("HttpClient", function(env)

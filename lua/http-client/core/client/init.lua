@@ -15,6 +15,8 @@ local proxy = require(("http-client.core.client.%s"):format(config.client))
 ---@field response Response
 ---@field animation Animation
 ---@field render Render
+---@field systemObj vim.SystemObj?
+---@field stoped boolean
 local ClientProxy = {}
 ClientProxy.__index = ClientProxy
 
@@ -27,6 +29,8 @@ function ClientProxy.new(request_info)
     self.request = Request.new(parser.rest_node_analyse(request_info[1]))
     self.render = nil
     self.response = nil
+    self.systemObj = nil
+    self.stoped = false
 
     return self
 end
@@ -45,21 +49,34 @@ function ClientProxy:start()
     self.request = hooks.process_request(self.request)
 
     self.animation:start()
-    vim.system(
+    self.systemObj = vim.system(
         command,
         {
             text = true,
         },
         vim.schedule_wrap(function(out)
-            local resp_data = proxy.process_response(out)
-            self.response = hooks.process_response(Response.new(resp_data))
+            if not self.stoped then
+                local resp_data = proxy.process_response(out)
+                self.response = hooks.process_response(Response.new(resp_data))
+                self.animation:clear()
 
-            self.animation:clear()
-
-            self.render = Render.new(self.request, self.response)
-            self.render:start()
+                self.render = Render.new(self.request, self.response)
+                self.render:start()
+                self.stoped = true
+            end
         end)
     )
+end
+
+---
+--- Stop request
+---
+function ClientProxy:stop()
+    if not self.stoped and self.systemObj then
+        self.animation:clear()
+        self.systemObj:kill(9)
+        self.stoped = true
+    end
 end
 
 return ClientProxy
