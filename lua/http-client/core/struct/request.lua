@@ -8,6 +8,7 @@
 ---@field xml_body? string
 ---@field raw_body? string
 ---@field content_type? string
+---@field magic_variables? table<string, string>
 
 ---@class Request
 ---@field method string
@@ -19,8 +20,11 @@
 ---@field xml_body? string
 ---@field raw_body? string
 ---@field content_type? string
+---@field magic_variables? table<string, string>
+---@field info string
 ---@field command? table<string>
 ---@field curl_command? string
+
 local Request = {}
 Request.__index = Request
 
@@ -32,6 +36,15 @@ function Request.new(rest_data)
     for key, value in pairs(rest_data) do
         self[key] = value
     end
+
+    local info = {}
+    if not vim.tbl_isempty(rest_data.magic_variables) then
+        for key, value in pairs(rest_data.magic_variables) do
+            table.insert(info, string.format("%s: %s", key, value))
+        end
+    end
+
+    self.info = table.concat(info, "\n")
 
     self.command = nil
     self.curl_command = nil

@@ -7,7 +7,7 @@ local M = {}
 
 --- Escapes a URL string for use in a query
 ---
---- This function replaces special characters in the URL with their percent-encoded equivalents.
+--- This function magic_variables special characters in the URL with their percent-encoded equivalents.
 ---
 ---@param s string The URL string to be escaped.
 ---@return string The escaped URL string.
@@ -102,7 +102,10 @@ end
 ---@param url_node TSNode
 ---@return RawRestData
 function M.url_node_analyse(url_node, rest_data)
-    local text = replace_placeholders(vim.treesitter.get_node_text(url_node, 0))
+    local text, magic_variables =
+        replace_placeholders(vim.treesitter.get_node_text(url_node, 0))
+    rest_data.magic_variables =
+        vim.tbl_extend("keep", rest_data.magic_variables, magic_variables)
 
     local parts = vim.fn.split(text, "?", 1)
 
@@ -139,8 +142,10 @@ end
 ---@param head_node TSNode
 ---@return RawRestData
 function M.head_node_analyse(head_node, rest_data)
-    local text =
+    local text, magic_variables =
         replace_placeholders(vim.treesitter.get_node_text(head_node, 0))
+    rest_data.magic_variables =
+        vim.tbl_extend("keep", rest_data.magic_variables, magic_variables)
 
     local parts = vim.fn.split(text, ":", 1)
 
@@ -159,8 +164,10 @@ end
 ---@param raw_body_node TSNode
 ---@return RawRestData
 function M.raw_body_node_analyse(raw_body_node, rest_data)
-    local text =
+    local text, magic_variables =
         replace_placeholders(vim.treesitter.get_node_text(raw_body_node, 0))
+    rest_data.magic_variables =
+        vim.tbl_extend("keep", rest_data.magic_variables, magic_variables)
 
     text = vim.fn.trim(text):gsub(" ", "")
 
@@ -191,8 +198,14 @@ end
 function M.external_node_analyse(external_node, rest_data)
     for node in external_node:iter_children() do
         if "path" == node:type() then
-            local text =
+            local text, magic_variables =
                 replace_placeholders(vim.treesitter.get_node_text(node, 0))
+            rest_data.magic_variables = vim.tbl_extend(
+                "keep",
+                rest_data.magic_variables,
+                magic_variables
+            )
+
             local parts = vim.fn.split(text, ":", 1)
 
             local file_name = ""
@@ -219,6 +232,7 @@ function M.rest_node_analyse(rest_node)
     rest_data.headers = {}
     rest_data.form_data = {}
     rest_data.files = {}
+    rest_data.magic_variables = {}
 
     for node in rest_node:iter_children() do
         local node_type = node:type()
@@ -232,8 +246,15 @@ function M.rest_node_analyse(rest_node)
         elseif node_type == "external_body" then
             M.external_node_analyse(node, rest_data)
         else
-            rest_data[node_type] =
+            local text, magic_variables =
                 replace_placeholders(vim.treesitter.get_node_text(node, 0))
+            rest_data[node_type] = text
+
+            rest_data.magic_variables = vim.tbl_extend(
+                "keep",
+                rest_data.magic_variables,
+                magic_variables
+            )
         end
     end
 

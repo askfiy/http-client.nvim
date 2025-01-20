@@ -58,11 +58,12 @@ end
 
 ---@return string The normal template based on the content type of the response.
 function Render:get_render_template()
-    local BASE_TEMPLATE = "%s\n---\n%s\n---\n%s\n"
+    local BASE_TEMPLATE = "%s\n---\n%s\n---\n%s\n---\n%s\n"
 
     if self.response.content_type:match("application/json") then
         return BASE_TEMPLATE:format(
             self.response.headers,
+            self.request.info,
             ("```json\n%s\n```"):format(
                 vim._json.encode(vim._json.decode(self.response.body), {
                     indent = true,
@@ -75,10 +76,8 @@ function Render:get_render_template()
     if self.response.content_type:match("application/xml") then
         return BASE_TEMPLATE:format(
             self.response.headers,
-            ("%s\n---\n```xml\n%s\n```"):format(
-                self.response.headers,
-                vim.fn.trim(self.response.body)
-            ),
+            self.request.info,
+            ("```xml\n%s\n```"):format(vim.fn.trim(self.response.body)),
             self.response.info
         )
     end
@@ -86,10 +85,8 @@ function Render:get_render_template()
     if self.response.content_type:match("text/html") then
         return BASE_TEMPLATE:format(
             self.response.headers,
-            ("%s\n---\n```html\n%s\n```"):format(
-                self.response.headers,
-                vim.fn.trim(self.response.body)
-            ),
+            self.request.info,
+            ("```html\n%s\n```"):format(vim.fn.trim(self.response.body)),
             self.response.info
         )
     end

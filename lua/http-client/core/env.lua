@@ -82,10 +82,16 @@ end
 --- Replaces placeholders in the content string with their corresponding values from various sources.
 ---
 --- @param content string The content string containing placeholders to be replaced.
---- @return string The content string with placeholders replaced by actual values.
+--- @return string, table The content string with placeholders replaced by actual values.
 function M.replace_placeholders(content)
+    local env = {}
+    local magic_variables = {}
+
     if content:match("{{.*}}") then
-        local env = generate_magic_variable(content)
+        env = generate_magic_variable(content)
+
+        -- Copy
+        magic_variables = env
 
         -- Update env with variables from different sources
         env = vim.tbl_extend("keep", env, load_buffer_env())
@@ -103,10 +109,10 @@ function M.replace_placeholders(content)
             not match_placeholder,
             ("Untreated Placeholder: %s"):format(match_placeholder)
         )
-        return content
+        return content, magic_variables
     end
 
-    return content
+    return content, magic_variables
 end
 
 return M
