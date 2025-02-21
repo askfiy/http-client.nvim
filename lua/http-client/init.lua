@@ -73,7 +73,7 @@ local function stop_request()
     end
 end
 
----@param opts table<string, any>
+---@param opts? table<string, any>
 function M.setup(opts)
     config.update(opts)
 
