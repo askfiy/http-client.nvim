@@ -90,6 +90,8 @@ function M.process_response(out)
     if not err then
         -- Skip the "100 Continue" response
         local stdout = out.stdout:gsub("HTTP/.* 100 Continue\r?\n\r?\n", "")
+        -- Skip the "200 Connection established" response
+        stdout = stdout:gsub("HTTP/1.1 200 Connection established\r?\n\r?\n", "")
         local headers, body, time, size =
             stdout:match("^(.-)\r?\n\r?\n(.*)\r?\n?{{(.*)}} {{(.*)}}")
 
